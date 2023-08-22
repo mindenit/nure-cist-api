@@ -1,0 +1,11 @@
+{
+  "name": "nure-cist-api",
+  "version": "1.0.0",
+  "description": "API for scheduling bot nure",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ruddnovskiy@gmail.com",
+  "license": "GNU"
+}
