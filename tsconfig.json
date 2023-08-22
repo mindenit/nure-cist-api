@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "outDir": "dist",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "skipDefaultLibCheck": true,
+    "sourceMap": true,
+    "declaration": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "removeComments": true,
+    "esModuleInterop": true,
+    "lib": [ "es6", "dom" ],
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
