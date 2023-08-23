@@ -12,7 +12,8 @@
         "warn",
         { "argsIgnorePattern": "^_" }
       ],
-      "@typescript-eslint/no-floating-promises": "off"
+      "@typescript-eslint/no-floating-promises": "off",
+      "quotes": ["error", "single"]
     },
     "parserOptions": {
       "project": "./tsconfig.json"
