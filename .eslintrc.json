@@ -13,6 +13,7 @@
         { "argsIgnorePattern": "^_" }
       ],
       "@typescript-eslint/no-floating-promises": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
       "quotes": ["error", "single"]
     },
     "parserOptions": {
