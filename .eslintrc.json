@@ -14,8 +14,14 @@
       ],
       "@typescript-eslint/no-floating-promises": "off",
       "@typescript-eslint/no-unsafe-argument": "off",
-      "quotes": ["error", "single"]
-    },
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/require-await": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+        "quotes": ["error", "single"]
+      },
     "parserOptions": {
       "project": "./tsconfig.json"
     }

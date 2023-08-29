@@ -12,7 +12,9 @@
     "noFallthroughCasesInSwitch": true,
     "removeComments": true,
     "esModuleInterop": true,
-    "lib": [ "es6", "dom" ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "lib": [ "es6", "dom", "es5", "DOM.Iterable" ],
   },
   "include": [
     "src/**/*"
