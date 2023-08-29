@@ -1,10 +1,10 @@
-export interface IScheduleParams {
-    groupId: number;
-}
-
 export interface IScheduleQueries {
     start_time: number;
     end_time: number;
+    groupId?: number;
+    teacherId?: number;
+    auditoryId?: number;
+    type: 'group' | 'teacher' | 'auditory';
 }
 
 export interface IDecodedSchedule {

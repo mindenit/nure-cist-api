@@ -34,7 +34,7 @@ schedulingParserJob().then().catch()
 
 app.listen(
   {
-    port: env.PORT,
+    port: env.PORT ?? 3000,
     host: env.HOST ?? 'localhost'
   },
   (err, _address) => {

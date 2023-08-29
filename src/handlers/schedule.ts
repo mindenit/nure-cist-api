@@ -10,7 +10,7 @@ import {
 } from '../utils/schedule';
 
 // Interfaces
-import { IScheduleParams, IScheduleQueries } from '../interfaces/schedule';
+import { IScheduleQueries } from '../interfaces/schedule';
 
 // Models
 import { Subject } from '../db/models/Subject';
@@ -21,8 +21,9 @@ import { Group } from '../db/models/Group';
 
 export const getScheduleByGroupName = async (_req: FastifyRequest, res: FastifyReply) => {
     try {
-        const { groupId } = <IScheduleParams>_req.params;
-        const { start_time, end_time } = <IScheduleQueries>_req.query
+        const { start_time, end_time, groupId } = <IScheduleQueries>_req.query
+
+        // const typeId = type === 'group' ? 1 : type === 'teacher' ? 2 : 3;
 
         const findingGroup = await getGroupById(groupId);
 

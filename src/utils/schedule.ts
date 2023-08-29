@@ -74,7 +74,7 @@ export const getEventsByGroupNameFromCist = async (groupId: number): Promise<IDe
         const septemberFirstNextYearUnix = Math.floor(septemberFirstNextYear.getTime() / 1000);
         console.log(septemberFirstNextYearUnix)
 
-        const schedule = await fetch(`${env.API_URL}/P_API_EVENTS_GROUP_JSON?p_id_group=${groupId}&time_from=${startOfWeekUnix}&time_to=${septemberFirstNextYearUnix}&idClient=${env.API_KEY}`, {
+        const schedule = await fetch(`${env.API_URL}/P_API_EVEN_JSON??timetable_id=${groupId}&time_from=${startOfWeekUnix}&time_to=${septemberFirstNextYearUnix}&type_id=1&idClient=${env.API_KEY}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
