@@ -39,7 +39,7 @@ export const getScheduleByGroupName = async (_req: FastifyRequest, res: FastifyR
         }
 
         const eventsFromCist = await getEventsByGroupNameFromCist(findingGroup.id);
-
+        console.log(eventsFromCist)
         for (const subject of eventsFromCist.subjects) {
             await Subject.findOrCreate({
                 where: {

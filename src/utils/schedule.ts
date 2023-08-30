@@ -72,16 +72,15 @@ export const getEventsByGroupNameFromCist = async (groupId: number): Promise<IDe
 
         const startOfWeekUnix = Math.floor(startOfWeek.getTime() / 1000);
         const septemberFirstNextYearUnix = Math.floor(septemberFirstNextYear.getTime() / 1000);
-        console.log(septemberFirstNextYearUnix)
 
-        const schedule = await fetch(`${env.API_URL}/P_API_EVEN_JSON??timetable_id=${groupId}&time_from=${startOfWeekUnix}&time_to=${septemberFirstNextYearUnix}&type_id=1&idClient=${env.API_KEY}`, {
+        console.log(`${env.API_URL}/P_API_EVEN_JSON?timetable_id=${groupId}&time_from=${startOfWeekUnix}&time_to=${septemberFirstNextYearUnix}&type_id=1&idClient=${env.API_KEY}`)
+        const schedule = await fetch(`${env.API_URL}/P_API_EVEN_JSON?timetable_id=${groupId}&time_from=${startOfWeekUnix}&time_to=${septemberFirstNextYearUnix}&type_id=1&idClient=${env.API_KEY}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
+                // 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
             }
         })
-
         return JSON.parse(jsonrepair(iconv.decode(Buffer.from(await schedule.arrayBuffer()), 'win1251')));
     }
     catch (e) {
