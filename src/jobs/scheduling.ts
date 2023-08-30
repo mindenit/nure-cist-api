@@ -12,6 +12,8 @@ import { Group } from '../db/models/Group'
 // Interfaces 
 import { IDecodedGroup } from '../interfaces/group'
 import { IDecodedTeachers } from '../interfaces/teacher'
+import { IDecodedAuditories } from '../interfaces/auditory'
+import { Auditory } from '../db/models/Auditory'
 
 export const schedulingParserJob = async (): Promise<void> => {
     try {
@@ -34,6 +36,16 @@ export const schedulingParserJob = async (): Promise<void> => {
         const fixedJsonTeachers = jsonrepair(decodedTeachers);
         const repairedDecodedTeachers: IDecodedTeachers = JSON.parse(fixedJsonTeachers);
         await syncTeachersFromData(repairedDecodedTeachers);
+
+        const auditories = await fetch(`${env.API_URL}/P_API_AUDITORIES_JSON`, {
+            method: 'GET',
+            headers,
+        });
+
+        const decodedAuditories = iconv.decode(Buffer.from(await auditories.arrayBuffer()), 'win1251');
+        const fixedJsonAuditories = jsonrepair(decodedAuditories);
+        const repairedDecodedAuditories: IDecodedAuditories = JSON.parse(fixedJsonAuditories);
+        await syncAuditoriesFromData(repairedDecodedAuditories)
 
     } catch (error) {
         console.log('[schedulingParserJob]', error);
@@ -91,6 +103,19 @@ const syncGroupsFromData = async (groupsData:IDecodedGroup): Promise<void> => {
             }
         }
     }   
+}
+
+const syncAuditoriesFromData = async (auditories: IDecodedAuditories) => {
+    for (const building of auditories.university.buildings) {
+        for (const { short_name, id } of building.auditories) {
+            await Auditory.findOrCreate({
+                where: {
+                    id,
+                    name: short_name
+                }
+            })
+        }
+    }
 }
 
 const isIterable = (obj: unknown) => {

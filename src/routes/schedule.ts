@@ -1,9 +1,12 @@
 // Core
 import { FastifyPluginCallback } from 'fastify';
-import {getGroups, getScheduleByGroupName} from '../handlers/schedule';
+import {getGroups, getScheduleByTypeAndid, getTeachers, getAuditories } from '../handlers/schedule';
 
 export const scheduleRoute: FastifyPluginCallback = (fastify, _opts, done) => {
-    fastify.get('/schedule', getScheduleByGroupName);
+    fastify.get('/schedule', getScheduleByTypeAndid);
     fastify.get('/groups', getGroups);
+    fastify.get('/teachers', getTeachers);
+    fastify.get('/auditories', getAuditories);
+
     done();
 }

@@ -3,77 +3,121 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 
 // Tools
 import {
-    getEventsByGroupNameFromCist,
+    checkTimeDifference,
+    getAuditoryById,
+    getEventsByIdFromCist,
     getGroupById,
-    getLessonType,
-    getScheduleByGroupId
+    getScheduleByType,
+    getTeacherById,
+    parseCistEvents,
 } from '../utils/schedule';
 
 // Interfaces
 import { IScheduleQueries } from '../interfaces/schedule';
 
 // Models
-import { Subject } from '../db/models/Subject';
-import { Event } from '../db/models/Event'
-import { TeacherEvent } from '../db/models/TeacherEvent';
-import { GroupEvent } from '../db/models/GroupEvent';
 import { Group } from '../db/models/Group';
+import { Teacher } from '../db/models/Teacher';
+import { Auditory } from '../db/models/Auditory';
+import { Event } from '../db/models/Event'
 
-export const getScheduleByGroupName = async (_req: FastifyRequest, res: FastifyReply) => {
+export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyReply) => {
     try {
-        const { start_time, end_time, groupId } = <IScheduleQueries>_req.query
+        const { start_time, end_time, id, type } = <IScheduleQueries>_req.query
 
-        // const typeId = type === 'group' ? 1 : type === 'teacher' ? 2 : 3;
+        const typeId = type === 'group' ? 1 : type === 'teacher' ? 2 : 3;
 
-        const findingGroup = await getGroupById(groupId);
+        if (typeId === 1) {
+            const findingGroup = await getGroupById(id);
 
-        if (!findingGroup) {
-            return res.notFound('Invalid group id')
-        }
-
-        const schedule = await getScheduleByGroupId(findingGroup.id, start_time, end_time);
-
-        if (schedule.length !== 0) {
-            res.code(200);
-            return res.send(schedule);
-        }
-
-        const eventsFromCist = await getEventsByGroupNameFromCist(findingGroup.id);
-        console.log(eventsFromCist)
-        for (const subject of eventsFromCist.subjects) {
-            await Subject.findOrCreate({
-                where: {
-                    id: subject.id,
-                    brief: subject.brief,
-                    title: subject.title
-                }
-            });
-        }
-
-        for (const { number_pair, end_time, start_time, subject_id, type, auditory, teachers } of  eventsFromCist.events) {
-            const newEvent = await Event.create({
-                number_pair,
-                end_time,
-                start_time,
-                subjectId: subject_id,
-                auditory,
-                type: getLessonType(type)
-            })
-
-            for (const teacher of teachers) {
-                await TeacherEvent.create({
-                    eventId: newEvent.id,
-                    teacherId: teacher
-                })
+            if (!findingGroup) {
+                return res.notFound(`Invalid ${type} id`)
             }
 
-            await GroupEvent.create({
-                eventId: newEvent.id,
-                groupId: findingGroup.id
-            })
+            const schedule = await getScheduleByType({ id, start_time, end_time, type, attr: ['createdAt'] });
+            if (schedule.length !== 0) {
+                if (await checkTimeDifference(schedule[0])) {
+                    schedule.map(async (el) => await Event.destroy({
+                        where: {
+                            id: el.id
+                        }
+                    }))
+                    const eventsFromCist = await getEventsByIdFromCist(id, typeId);
+
+                    await parseCistEvents({ eventsFromCist, type, id })
+                    res.code(200);
+                    return res.send(await getScheduleByType({ id, start_time, end_time, type }))
+                }
+                res.code(200);
+                return res.send(schedule);
+            }
         }
+
+        if (typeId === 2) {
+            const findingTeacher = await getTeacherById(id);
+
+            if (!findingTeacher) {
+                return res.notFound(`Invalid ${type} id`)
+            }
+
+            const schedule = await getScheduleByType({ id, start_time, end_time, type });
+
+            if (schedule.length !== 0) {
+                if (await checkTimeDifference(schedule[0])) {
+                    schedule.map(async (el) => await Event.destroy({
+                        where: {
+                            id: el.id
+                        }
+                    }))
+                    const eventsFromCist = await getEventsByIdFromCist(id, typeId);
+
+                    await parseCistEvents({ eventsFromCist, type, id })
+                    res.code(200);
+                    return res.send(await getScheduleByType({ id, start_time, end_time, type }))
+                }
+                res.code(200);
+                return res.send(schedule);
+            }
+        }
+
+        if (typeId === 3) {
+            const findingAuditory = await getAuditoryById(id);
+
+            if (!findingAuditory) {
+                return res.notFound(`Invalid ${type} id`)
+            }
+
+            const schedule = await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type });
+
+            if (schedule.length !== 0) {
+                if (await checkTimeDifference(schedule[0])) {
+                    schedule.map(async (el) => await Event.destroy({
+                        where: {
+                            id: el.id
+                        }
+                    }))
+                    const eventsFromCist = await getEventsByIdFromCist(id, typeId);
+
+                    await parseCistEvents({ eventsFromCist, type, id })
+                    res.code(200);
+                    return res.send(await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type }))
+                }
+                res.code(200);
+                return res.send(schedule);
+            }
+
+            const eventsFromCist = await getEventsByIdFromCist(id, typeId);
+
+            await parseCistEvents({ eventsFromCist, type, id })
+            res.code(200);
+            return res.send(await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type }))
+        }
+
+        const eventsFromCist = await getEventsByIdFromCist(id, typeId);
+
+        await parseCistEvents({ eventsFromCist, type, id })
         res.code(200);
-        return res.send(await getScheduleByGroupId(findingGroup.id, start_time, end_time))
+        return res.send(await getScheduleByType({ id, start_time, end_time, type }))
 
     }
     catch (e) {
@@ -90,6 +134,30 @@ export const getGroups = async (_req: FastifyRequest, res: FastifyReply) => {
     }
     catch (e) {
         console.log('[getGroups]', e)
+        return res.internalServerError('Internal server error');
+    }
+}
+
+export const getTeachers = async (_req: FastifyRequest, res: FastifyReply) => {
+    try {
+        const teachers = await Teacher.findAll();
+
+        return res.code(200).send(teachers);
+    }
+    catch (e) {
+        console.log('[getTeachers]', e)
+        return res.internalServerError('Internal server error');
+    }
+}
+
+export const getAuditories = async (_req: FastifyRequest, res: FastifyReply) => {
+    try {
+        const auditories = await Auditory.findAll();
+
+        return res.code(200).send(auditories);
+    }
+    catch (e) {
+        console.log('[getAuditories]', e)
         return res.internalServerError('Internal server error');
     }
 }

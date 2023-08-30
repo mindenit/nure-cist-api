@@ -19,7 +19,7 @@ export enum LessonType {
 }
 
 @Table({ 
-    timestamps: false
+    timestamps: true
 })
 export class Event extends Model {
     @Column({ type: DataType.BIGINT, primaryKey: true, autoIncrement: true })

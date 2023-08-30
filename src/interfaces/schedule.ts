@@ -1,9 +1,7 @@
 export interface IScheduleQueries {
     start_time: number;
     end_time: number;
-    groupId?: number;
-    teacherId?: number;
-    auditoryId?: number;
+    id: number;
     type: 'group' | 'teacher' | 'auditory';
 }
 

@@ -13,7 +13,7 @@ export class TeacherEvent extends Model {
     @ForeignKey(() => Event)
     eventId: number;
 
-    @Column({ type: DataType.STRING, primaryKey: true })
+    @Column({ type: DataType.BIGINT, primaryKey: true })
     @ForeignKey(() => Teacher)
-    teacherId: string;
+    teacherId: number;
 }

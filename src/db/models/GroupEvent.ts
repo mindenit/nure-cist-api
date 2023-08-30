@@ -11,7 +11,7 @@ export class GroupEvent extends Model {
     @ForeignKey(() => Event)
     eventId: number;
 
-    @Column({ type: DataType.STRING, primaryKey: true })
+    @Column({ type: DataType.BIGINT, primaryKey: true })
     @ForeignKey(() => Group)
-    groupId: string;
+    groupId: number;
 }
