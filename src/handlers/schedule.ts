@@ -46,10 +46,10 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
 
                     await parseCistEvents({ eventsFromCist, type, id })
                     res.code(200);
-                    return res.send(await getScheduleByType({ id, start_time, end_time, type }))
+                    return res.send(JSON.stringify(await getScheduleByType({ id, start_time, end_time, type }), null, 2))
                 }
                 res.code(200);
-                return res.send(schedule);
+                return res.send(JSON.stringify(schedule, null, 2));
             }
         }
 
@@ -73,10 +73,10 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
 
                     await parseCistEvents({ eventsFromCist, type, id })
                     res.code(200);
-                    return res.send(await getScheduleByType({ id, start_time, end_time, type }))
+                    return res.send(JSON.stringify(await getScheduleByType({ id, start_time, end_time, type }), null, 2))
                 }
                 res.code(200);
-                return res.send(schedule);
+                return res.send(JSON.stringify(schedule, null, 2));
             }
         }
 
@@ -100,24 +100,24 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
 
                     await parseCistEvents({ eventsFromCist, type, id })
                     res.code(200);
-                    return res.send(await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type }))
+                    return res.send(JSON.stringify(await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type }), null, 2))
                 }
                 res.code(200);
-                return res.send(schedule);
+                return res.send(JSON.stringify(schedule, null, 2));
             }
 
             const eventsFromCist = await getEventsByIdFromCist(id, typeId);
 
             await parseCistEvents({ eventsFromCist, type, id })
             res.code(200);
-            return res.send(await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type }))
+            return res.send(JSON.stringify(await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type }), null, 2))
         }
 
         const eventsFromCist = await getEventsByIdFromCist(id, typeId);
 
         await parseCistEvents({ eventsFromCist, type, id })
         res.code(200);
-        return res.send(await getScheduleByType({ id, start_time, end_time, type }))
+        return res.send(JSON.stringify(await getScheduleByType({ id, start_time, end_time, type }), null, 2))
 
     }
     catch (e) {
@@ -130,7 +130,7 @@ export const getGroups = async (_req: FastifyRequest, res: FastifyReply) => {
     try {
         const groups = await Group.findAll();
 
-        return res.code(200).send(groups);
+        return res.code(200).send(JSON.stringify(groups, null, 2));
     }
     catch (e) {
         console.log('[getGroups]', e)
@@ -142,7 +142,7 @@ export const getTeachers = async (_req: FastifyRequest, res: FastifyReply) => {
     try {
         const teachers = await Teacher.findAll();
 
-        return res.code(200).send(teachers);
+        return res.code(200).send(JSON.stringify(teachers, null, 2));
     }
     catch (e) {
         console.log('[getTeachers]', e)
@@ -154,7 +154,7 @@ export const getAuditories = async (_req: FastifyRequest, res: FastifyReply) => 
     try {
         const auditories = await Auditory.findAll();
 
-        return res.code(200).send(auditories);
+        return res.code(200).send(JSON.stringify(auditories, null, 2));
     }
     catch (e) {
         console.log('[getAuditories]', e)
