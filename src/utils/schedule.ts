@@ -79,6 +79,7 @@ export const getScheduleByType = async ({id, start_time, end_time, type, attr}: 
                 },
                 {
                     model: Teacher,
+                    required: false,
                     where: {
                         ...(type === 'teacher' ? { id } : null )
 
