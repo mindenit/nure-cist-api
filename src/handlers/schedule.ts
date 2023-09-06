@@ -117,7 +117,8 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
 
         await parseCistEvents({ eventsFromCist, type, id })
         res.code(200);
-        return res.send(JSON.stringify(await getScheduleByType({ id, start_time, end_time, type }), null, 2))
+        const response = await getScheduleByType({ id, start_time, end_time, type })
+        return res.send(JSON.stringify(response, null, 2))
 
     }
     catch (e) {

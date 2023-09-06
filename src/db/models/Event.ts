@@ -1,5 +1,5 @@
 // Core
-import {Model, Table, Column, DataType, BelongsTo, ForeignKey, BelongsToMany} from 'sequelize-typescript'
+import {Model, Table, Column, DataType, BelongsTo, ForeignKey, BelongsToMany, DefaultScope} from 'sequelize-typescript'
 
 // Models
 import { Group } from './Group';
@@ -17,14 +17,18 @@ export enum LessonType {
     KpKr = 'КП/КР',
     Lk = 'Лк',
 }
-
-@Table({ 
+@DefaultScope(() => ({
+    attributes: {
+        exclude: ['subjectId', 'createdAt']
+    }
+}))
+@Table({
     timestamps: true
 })
 export class Event extends Model {
     @Column({ type: DataType.BIGINT, primaryKey: true, autoIncrement: true })
     id: number;
-    
+
     @Column({ type: DataType.BIGINT, })
     start_time: number;
 
@@ -47,7 +51,7 @@ export class Event extends Model {
         through: { model: () => GroupEvent }
     })
     groups: Group[];
-    
+
     @BelongsToMany(() => Teacher, {
         through: { model: () => TeacherEvent }
     })

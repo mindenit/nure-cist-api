@@ -17,7 +17,6 @@ import { IDecodedSchedule } from '../interfaces/schedule';
 import { GroupEvent } from '../db/models/GroupEvent';
 import { TeacherEvent } from '../db/models/TeacherEvent';
 import { Auditory } from '../db/models/Auditory';
-
 export const getGroupById = async (groupId: number): Promise<Group> => {
     try {
         return await Group.findByPk(groupId);
@@ -65,9 +64,6 @@ export const getScheduleByType = async ({id, start_time, end_time, type, attr}: 
                 },
             ...(type === 'auditory' ? { auditory: id  } : null)
             },
-            attributes: {
-                exclude: ['subjectId', 'createdAt']
-            },
             include: [
                 {
                     model: Group,
@@ -75,6 +71,7 @@ export const getScheduleByType = async ({id, start_time, end_time, type, attr}: 
                     ...(type === 'group' ? { id } : null )
                     },
                     include: [],
+                    duplicating: false,
                     through: { attributes: [] }
                 },
                 {
@@ -91,7 +88,7 @@ export const getScheduleByType = async ({id, start_time, end_time, type, attr}: 
                     model: Subject
                 }
             ],
-            order: [['updatedAt', 'DESC']]
+            order: [['updatedAt', 'DESC']],
         })
     }
     catch (e) {
