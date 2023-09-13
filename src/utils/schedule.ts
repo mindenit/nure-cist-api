@@ -71,6 +71,9 @@ export const getScheduleByType = async ({id, start_time, end_time, type, attr}: 
                     ...(type === 'group' ? { id } : null )
                     },
                     include: [],
+                    attributes: {
+                        exclude: ['lastRequest', 'isActive'],
+                    },
                     duplicating: false,
                     through: { attributes: [] }
                 },
@@ -80,6 +83,9 @@ export const getScheduleByType = async ({id, start_time, end_time, type, attr}: 
                     where: {
                         ...(type === 'teacher' ? { id } : null )
 
+                    },
+                    attributes: {
+                        exclude: ['lastRequest', 'isActive'],
                     },
                     include: [],
                     through: { attributes: [] }
@@ -294,9 +300,20 @@ export const parseCistEvents = async ({ eventsFromCist, id, type: incomingType}:
     }
 }
 
-export const checkTimeDifference = async (event: Event) => {
-    const currentTime = new Date();
-    const timeDifferenceInMilliseconds = currentTime.getTime() - event.updatedAt.getTime();
-    const threeHoursInMilliseconds = 3 * 60 * 60 * 1000;
-    return timeDifferenceInMilliseconds > threeHoursInMilliseconds;
+export const calculateTimeForJobs = () => {
+    const currentDate = new Date();
+
+    const daysUntilMonday = (1 - currentDate.getDay() + 7) % 7;
+    const millisecondsUntilMonday = daysUntilMonday * 24 * 60 * 60 * 1000;
+
+    const daysUntilFriday = (5 - currentDate.getDay() + 7) % 7;
+    const millisecondsUntilFriday = (daysUntilFriday + 1) * 24 * 60 * 60 * 1000;
+
+    const startTimestamp = Math.floor((currentDate.getTime() + millisecondsUntilMonday) / 1000);
+    const endTimestamp = Math.floor((currentDate.getTime() + millisecondsUntilFriday) / 1000);
+
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+    return { startTimestamp, endTimestamp, fiveDaysAgo }
 }

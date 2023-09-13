@@ -2,13 +2,20 @@
 import helmet from '@fastify/helmet';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
+import fastifyCron from 'fastify-cron';
 
 // Tools
 import { createApp } from './app';
 import { env, config } from './config';
 import initDB from './db';
 import { scheduleRoute } from './routes/schedule';
+
+// Jobs
 import { schedulingParserJob } from './jobs/scheduling';
+import { groupsUpdate } from './jobs/groups';
+import { teachersUpdate } from './jobs/teachers';
+import { auditoriesUpdate } from './jobs/auditories';
+
 
 (function () {
   const app = createApp({
@@ -37,6 +44,25 @@ import { schedulingParserJob } from './jobs/scheduling';
     }
   })
 
+  app.register(fastifyCron, {
+    jobs: [{
+      cronTime: '0 6 * * *',
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      onTick: async () => await groupsUpdate()
+    },
+      {
+        cronTime: '15 6 * * *',
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onTick: async () => await teachersUpdate()
+      },
+      {
+        cronTime: '30 6 * * *',
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onTick: async () => await auditoriesUpdate()
+      }
+      ]
+  })
+
   app.get('/spec', async (_req, _res) => {
     return app.swagger();
   });
@@ -54,6 +80,7 @@ import { schedulingParserJob } from './jobs/scheduling';
         host: env.HOST ?? 'localhost'
       },
       (err, _address) => {
+        app.cron.startAllJobs();
         if (err) {
           app.log.error(err);
           process.exit(1);

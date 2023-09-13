@@ -3,7 +3,6 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 
 // Tools
 import {
-    checkTimeDifference,
     getAuditoryById,
     getEventsByIdFromCist,
     getGroupById,
@@ -19,7 +18,6 @@ import { IScheduleQueries } from '../interfaces/schedule';
 import { Group } from '../db/models/Group';
 import { Teacher } from '../db/models/Teacher';
 import { Auditory } from '../db/models/Auditory';
-import { Event } from '../db/models/Event'
 
 export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyReply) => {
     try {
@@ -34,20 +32,13 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
                 return res.notFound(`Invalid ${type} id`)
             }
 
+            await findingGroup.update({
+                isActive: true,
+                lastRequest: new Date().toDateString(),
+            })
+
             const schedule = await getScheduleByType({ id, start_time, end_time, type, attr: ['createdAt'] });
             if (schedule.length !== 0) {
-                if (await checkTimeDifference(schedule[0])) {
-                    schedule.map(async (el) => await Event.destroy({
-                        where: {
-                            id: el.id
-                        }
-                    }))
-                    const eventsFromCist = await getEventsByIdFromCist(id, typeId);
-
-                    await parseCistEvents({ eventsFromCist, type, id })
-                    res.code(200);
-                    return res.send(JSON.stringify(await getScheduleByType({ id, start_time, end_time, type }), null, 2))
-                }
                 res.code(200);
                 return res.send(JSON.stringify(schedule, null, 2));
             }
@@ -60,21 +51,14 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
                 return res.notFound(`Invalid ${type} id`)
             }
 
+            await findingTeacher.update({
+                isActive: true,
+                lastRequest: new Date().toDateString(),
+            })
+
             const schedule = await getScheduleByType({ id, start_time, end_time, type });
 
             if (schedule.length !== 0) {
-                if (await checkTimeDifference(schedule[0])) {
-                    schedule.map(async (el) => await Event.destroy({
-                        where: {
-                            id: el.id
-                        }
-                    }))
-                    const eventsFromCist = await getEventsByIdFromCist(id, typeId);
-
-                    await parseCistEvents({ eventsFromCist, type, id })
-                    res.code(200);
-                    return res.send(JSON.stringify(await getScheduleByType({ id, start_time, end_time, type }), null, 2))
-                }
                 res.code(200);
                 return res.send(JSON.stringify(schedule, null, 2));
             }
@@ -87,21 +71,14 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
                 return res.notFound(`Invalid ${type} id`)
             }
 
+            await findingAuditory.update({
+                isActive: true,
+                lastRequest: new Date().toDateString(),
+            })
+
             const schedule = await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type });
 
             if (schedule.length !== 0) {
-                if (await checkTimeDifference(schedule[0])) {
-                    schedule.map(async (el) => await Event.destroy({
-                        where: {
-                            id: el.id
-                        }
-                    }))
-                    const eventsFromCist = await getEventsByIdFromCist(id, typeId);
-
-                    await parseCistEvents({ eventsFromCist, type, id })
-                    res.code(200);
-                    return res.send(JSON.stringify(await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type }), null, 2))
-                }
                 res.code(200);
                 return res.send(JSON.stringify(schedule, null, 2));
             }
@@ -129,7 +106,11 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
 
 export const getGroups = async (_req: FastifyRequest, res: FastifyReply) => {
     try {
-        const groups = await Group.findAll();
+        const groups = await Group.findAll({
+            attributes: {
+                exclude: ['lastRequest', 'isActive'],
+            },
+        });
 
         return res.code(200).send(JSON.stringify(groups, null, 2));
     }
@@ -141,7 +122,11 @@ export const getGroups = async (_req: FastifyRequest, res: FastifyReply) => {
 
 export const getTeachers = async (_req: FastifyRequest, res: FastifyReply) => {
     try {
-        const teachers = await Teacher.findAll();
+        const teachers = await Teacher.findAll({
+            attributes: {
+                exclude: ['lastRequest', 'isActive'],
+            },
+        });
 
         return res.code(200).send(JSON.stringify(teachers, null, 2));
     }
@@ -153,7 +138,11 @@ export const getTeachers = async (_req: FastifyRequest, res: FastifyReply) => {
 
 export const getAuditories = async (_req: FastifyRequest, res: FastifyReply) => {
     try {
-        const auditories = await Auditory.findAll();
+        const auditories = await Auditory.findAll({
+            attributes: {
+                exclude: ['lastRequest', 'isActive'],
+            },
+        });
 
         return res.code(200).send(JSON.stringify(auditories, null, 2));
     }
