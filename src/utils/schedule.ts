@@ -128,6 +128,10 @@ export const getEventsByIdFromCist = async (id: number, typeId: number): Promise
             }
         })
 
+        if (schedule.status >= 500) {
+            return;
+        }
+
         return JSON.parse(jsonrepair(iconv.decode(Buffer.from(await schedule.arrayBuffer()), 'win1251')));
     }
     catch (e) {

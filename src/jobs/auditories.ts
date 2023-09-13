@@ -23,6 +23,9 @@ export const auditoriesUpdate = async () => {
 
         for (const { name, id } of auditories) {
             const eventsFromCist = await getEventsByIdFromCist(id, 3)
+            if (!eventsFromCist) {
+                return;
+            }
             const schedule = await getScheduleByType({ id: name, start_time: startTimestamp, end_time: endTimestamp, type: 'auditory' });
             schedule.map(async (el) => await Event.destroy({
                 where: {

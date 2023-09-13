@@ -23,6 +23,9 @@ export const groupsUpdate = async () => {
 
         for (const { id } of groups) {
             const eventsFromCist = await getEventsByIdFromCist(id, 1,)
+            if (!eventsFromCist) {
+                return;
+            }
             const schedule = await getScheduleByType({ id, start_time: startTimestamp, end_time: endTimestamp, type: 'group' });
             schedule.map(async (el) => await Event.destroy({
                 where: {

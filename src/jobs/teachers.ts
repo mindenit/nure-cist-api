@@ -23,6 +23,9 @@ export const teachersUpdate = async () => {
 
         for (const { id } of teachers) {
             const eventsFromCist = await getEventsByIdFromCist(id, 2)
+            if (!eventsFromCist) {
+                return;
+            }
             const schedule = await getScheduleByType({ id, start_time: startTimestamp, end_time: endTimestamp, type: 'teacher' });
             schedule.map(async (el) => await Event.destroy({
                 where: {
