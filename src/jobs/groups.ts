@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 // Models
 import { Event } from '../db/models/Event';
 import { Group } from '../db/models/Group';
+import { GroupEvent } from '../db/models/GroupEvent';
 
 // Tools
 import {calculateTimeForJobs, getEventsByIdFromCist, getScheduleByType, parseCistEvents} from '../utils/schedule';
@@ -27,11 +28,24 @@ export const groupsUpdate = async () => {
                 return;
             }
             const schedule = await getScheduleByType({ id, start_time: startTimestamp, end_time: endTimestamp, type: 'group' });
+
             schedule.map(async (el) => await Event.destroy({
                 where: {
                     id: el.id
                 }
             }))
+            for (const { id } of schedule) {
+                await GroupEvent.destroy({
+                    where: {
+                        eventId: id
+                    }
+                })
+            }
+
+            if (!schedule.length) {
+                return;
+            }
+
             await parseCistEvents({ eventsFromCist, type: 'group', id })
         }
     }

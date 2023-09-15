@@ -32,6 +32,10 @@ export const auditoriesUpdate = async () => {
                     id: el.id
                 }
             }))
+
+            if (!schedule.length) {
+                return;
+            }
             await parseCistEvents({ eventsFromCist, type: 'auditory', id })
         }
     }

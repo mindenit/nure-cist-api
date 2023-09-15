@@ -4,10 +4,11 @@ import { Op } from 'sequelize';
 // Models
 import { Event } from '../db/models/Event';
 import { Teacher } from '../db/models/Teacher';
+import { TeacherEvent } from '../db/models/TeacherEvent';
+
 
 // Tools
 import {calculateTimeForJobs, getEventsByIdFromCist, getScheduleByType, parseCistEvents} from '../utils/schedule';
-
 export const teachersUpdate = async () => {
     try {
         const { fiveDaysAgo, startTimestamp, endTimestamp } = calculateTimeForJobs()
@@ -32,6 +33,18 @@ export const teachersUpdate = async () => {
                     id: el.id
                 }
             }))
+
+            for (const { id } of schedule) {
+                await TeacherEvent.destroy({
+                    where: {
+                        eventId: id
+                    }
+                })
+            }
+
+            if (!schedule.length) {
+                return;
+            }
             await parseCistEvents({ eventsFromCist, type: 'teacher', id })
         }
     }

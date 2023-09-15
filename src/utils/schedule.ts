@@ -308,13 +308,21 @@ export const calculateTimeForJobs = () => {
     const currentDate = new Date();
 
     const daysUntilMonday = (1 - currentDate.getDay() + 7) % 7;
-    const millisecondsUntilMonday = daysUntilMonday * 24 * 60 * 60 * 1000;
 
-    const daysUntilFriday = (5 - currentDate.getDay() + 7) % 7;
-    const millisecondsUntilFriday = (daysUntilFriday + 1) * 24 * 60 * 60 * 1000;
+    const previousMonday = new Date(currentDate);
+    previousMonday.setDate(currentDate.getDate() - daysUntilMonday);
 
-    const startTimestamp = Math.floor((currentDate.getTime() + millisecondsUntilMonday) / 1000);
-    const endTimestamp = Math.floor((currentDate.getTime() + millisecondsUntilFriday) / 1000);
+    const startTimestamp = Math.floor(previousMonday.getTime() / 1000);
+
+    const daysUntilNextMonday = (8 - currentDate.getDay()) % 7;
+
+    const startOfWeek = new Date(currentDate);
+    startOfWeek.setDate(currentDate.getDate() + daysUntilNextMonday);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 14);
+
+    const endTimestamp = Math.floor(endOfWeek.getTime() / 1000);
 
     const fiveDaysAgo = new Date();
     fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);

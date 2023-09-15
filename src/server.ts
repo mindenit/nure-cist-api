@@ -46,17 +46,17 @@ import { auditoriesUpdate } from './jobs/auditories';
 
   app.register(fastifyCron, {
     jobs: [{
-      cronTime: '0 6 * * *',
+      cronTime: '* * * * *',
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onTick: async () => await groupsUpdate()
     },
       {
-        cronTime: '15 6 * * *',
+        cronTime: '* * * * *',
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onTick: async () => await teachersUpdate()
       },
       {
-        cronTime: '30 6 * * *',
+        cronTime: '* * * * *',
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onTick: async () => await auditoriesUpdate()
       }
