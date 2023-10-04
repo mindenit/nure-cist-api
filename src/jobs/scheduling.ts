@@ -52,6 +52,11 @@ export const schedulingParserJob = async (): Promise<void> => {
     }    
 }
 
+
+const isIterable = (obj: unknown) => {
+    return typeof obj[Symbol.iterator] === 'function'
+}
+
 const syncTeachersFromData = async (teachersData: IDecodedTeachers): Promise<void> => {
     for (const faculty of teachersData.university.faculties) {
         for (const { teachers, departments } of faculty.departments) {
@@ -89,7 +94,7 @@ const syncTeachersFromData = async (teachersData: IDecodedTeachers): Promise<voi
 
 const syncGroupsFromData = async (groupsData:IDecodedGroup): Promise<void> => {
     for (const faculty of groupsData.university.faculties) {
-        for (const { groups } of faculty.directions) {
+        for (const { groups, specialities } of faculty.directions) {
             if (groups && isIterable(groups)) {
                 for (const { name, id } of groups) {
                     const group = await Group.findByPk(id);
@@ -101,7 +106,35 @@ const syncGroupsFromData = async (groupsData:IDecodedGroup): Promise<void> => {
                     }
                 }
             }
-        }
+            if (specialities && isIterable(specialities)) {
+                for (const { groups, directions } of specialities) {
+                    for (const { name, id } of groups) {
+                        const group = await Group.findByPk(id);
+                        if (name && id && !group) {
+                            await Group.create({
+                                name,
+                                id,
+                            })
+                        }
+                    }
+                    if (directions && isIterable(directions)) {
+                        for (const { groups } of directions) {
+                            if (groups && isIterable(groups)) {
+                                for (const { name, id } of groups) {
+                                    const group = await Group.findByPk(id);
+                                    if (name && id && !group) {
+                                        await Group.create({
+                                            name,
+                                            id,
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }        
     }   
 }
 
@@ -116,8 +149,4 @@ const syncAuditoriesFromData = async (auditories: IDecodedAuditories) => {
             })
         }
     }
-}
-
-const isIterable = (obj: unknown) => {
-    return typeof obj[Symbol.iterator] === 'function'
 }
