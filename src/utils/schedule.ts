@@ -294,16 +294,27 @@ export const parseCistEvents = async ({ eventsFromCist, id, type: incomingType}:
 
     if (eventsFromCist?.events && eventsFromCist.events.length !== 0) {
         for (const { number_pair, end_time, start_time, subject_id, groups, type, auditory, teachers } of  eventsFromCist.events) {
-            const newEvent = await Event.create({
-                number_pair,
-                end_time,
-                start_time,
-                subjectId: subject_id,
-                auditory,
-                type: getLessonType(type)
+            const [newEvent, isCreated] = await Event.findOrCreate({
+                where: {
+                    number_pair,
+                    end_time,
+                    start_time,
+                    subjectId: subject_id,
+                    auditory,
+                    type: getLessonType(type)
+                },
+                defaults: {
+                    number_pair,
+                    end_time,
+                    start_time,
+                    subjectId: subject_id,
+                    auditory,
+                    type: getLessonType(type)
+                }
             })
 
-            await (await handleCistEventsByType(incomingType))(groups, id, newEvent.id, teachers);
+
+             isCreated ? await (await handleCistEventsByType(incomingType))(groups, id, newEvent.id, teachers) : null
         }
     }
 }
