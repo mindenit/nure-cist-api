@@ -10,6 +10,10 @@ const EnvSchema = Type.Object({
   API_URL: Type.String(),
   API_KEY: Type.String(),
   DB_URI: Type.String(),
+  ACCESS_SECRET: Type.String(),
+  REFRESH_SECRET: Type.String(),
+  ACCESS_TIME: Type.String(),
+  REFRESH_TIME: Type.String(),
 });
 
 export const env = Value.Cast(EnvSchema, processEnv);

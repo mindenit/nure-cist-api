@@ -49,12 +49,13 @@ interface IScheduleTypePayload {
     type: string;
     start_time: number;
     end_time: number;
+    isDeleted: boolean;
     attr?: string[]
 }
 
-export const getScheduleByType = async ({id, start_time, end_time, type, attr}: IScheduleTypePayload): Promise<Event[]> => {
+export const getScheduleByType = async ({id, start_time, end_time, type, isDeleted}: IScheduleTypePayload): Promise<Event[]> => {
     try {
-        return  Event.findAll({
+        return Event.findAll({
             where: {
                 start_time: {
                     [Op.gte]: start_time
@@ -62,13 +63,14 @@ export const getScheduleByType = async ({id, start_time, end_time, type, attr}: 
                 end_time: {
                     [Op.lte]: end_time
                 },
-            ...(type === 'auditory' ? { auditory: id  } : null)
+                isDeleted,
+                ...(type === 'auditory' ? { auditory: id  } : null),
             },
             include: [
                 {
                     model: Group,
                     where: {
-                    ...(type === 'group' ? { id } : null )
+                        ...(type === 'group' ? { id } : null )
                     },
                     include: [],
                     attributes: {
@@ -328,4 +330,31 @@ export const calculateTimeForJobs = () => {
     fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
 
     return { startTimestamp, endTimestamp, fiveDaysAgo }
+}
+
+export const findDifference = (arr1: object[], arr2: object[]): object => {
+    const difference: object = {
+        newLessons: [],
+        canceledLessons: [],
+    }
+    for (const obj1 of arr1) {
+        for (const obj2 of arr2) {
+            // console.log(obj2['type'] === 'Зал' ? obj2 : '')
+            if (obj1['start_time'] === obj2['start_time'] && obj1['end_time'] === obj2['end_time']) {
+                if (obj1['groups'][0]['name'] !== obj2['groups'][0]['name'] || obj1['subject']['brief'] !== obj2['subject']['brief']) {
+                    difference['newLessons'].push(obj2)
+                    difference['canceledLessons'].push(obj1)
+                } else if (obj1['number_pair'] !== obj2['number_pair']) {
+                    difference['newLessons'].push(obj2)
+                    difference['canceledLessons'].push(obj1)
+                } else if (obj1['type'] !== obj2['type']) {
+                    difference['newLessons'].push(obj2)
+                    difference['canceledLessons'].push(obj1)
+                }
+            }
+        }
+    }
+
+    console.log(difference)
+    return difference
 }

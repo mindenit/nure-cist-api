@@ -2,9 +2,9 @@
 import { Op } from 'sequelize';
 
 // Models
-import { Event } from '../db/models/Event';
+// import { Event } from '../db/models/Event';
 import { Teacher } from '../db/models/Teacher';
-import { TeacherEvent } from '../db/models/TeacherEvent';
+// import { TeacherEvent } from '../db/models/TeacherEvent';
 
 
 // Tools
@@ -27,20 +27,18 @@ export const teachersUpdate = async () => {
             if (!eventsFromCist) {
                 return;
             }
-            const schedule = await getScheduleByType({ id, start_time: startTimestamp, end_time: endTimestamp, type: 'teacher' });
-            schedule.map(async (el) => await Event.destroy({
-                where: {
-                    id: el.id
-                }
+            const schedule = await getScheduleByType({ id, start_time: startTimestamp, end_time: endTimestamp, type: 'teacher', isDeleted: false });
+            schedule.map(async (el) => await el.update({
+                isDeleted: false,
             }))
 
-            for (const { id } of schedule) {
-                await TeacherEvent.destroy({
-                    where: {
-                        eventId: id
-                    }
-                })
-            }
+            // for (const { id } of schedule) {
+            //     await TeacherEvent.destroy({
+            //         where: {
+            //             eventId: id
+            //         }
+            //     })
+            // }
 
             if (!schedule.length) {
                 return;

@@ -12,10 +12,13 @@ import {TeacherEvent} from './models/TeacherEvent';
 import {Subject} from './models/Subject';
 import { Event } from './models/Event';
 import { Auditory } from './models/Auditory';
+import {Change} from './models/Change';
+import {User} from './models/User';
+import {UserGroup} from './models/UserGroup';
 
 export default async function (): Promise<Sequelize> {
     const sequelize = new Sequelize(env.DB_URI, {
-        models: [Group, Teacher, Event, GroupEvent, TeacherEvent, Subject, Auditory],
+        models: [User, Group, UserGroup, Teacher, Event, Change, GroupEvent, TeacherEvent, Subject, Auditory],
         pool: {
             max: 60,
             min: 0,

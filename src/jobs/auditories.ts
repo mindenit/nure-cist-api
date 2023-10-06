@@ -2,7 +2,7 @@
 import { Op } from 'sequelize';
 
 // Models
-import { Event } from '../db/models/Event';
+// import { Event } from '../db/models/Event';
 import { Auditory } from '../db/models/Auditory';
 
 // Tools
@@ -26,11 +26,9 @@ export const auditoriesUpdate = async () => {
             if (!eventsFromCist) {
                 return;
             }
-            const schedule = await getScheduleByType({ id: name, start_time: startTimestamp, end_time: endTimestamp, type: 'auditory' });
-            schedule.map(async (el) => await Event.destroy({
-                where: {
-                    id: el.id
-                }
+            const schedule = await getScheduleByType({ id: name, start_time: startTimestamp, end_time: endTimestamp, type: 'auditory', isDeleted: false });
+            schedule.map(async (el) => await el.update({
+                isDeleted: false
             }))
 
             if (!schedule.length) {

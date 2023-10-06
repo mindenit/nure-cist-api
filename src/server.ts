@@ -15,6 +15,7 @@ import { schedulingParserJob } from './jobs/scheduling';
 import { groupsUpdate } from './jobs/groups';
 import { teachersUpdate } from './jobs/teachers';
 import { auditoriesUpdate } from './jobs/auditories';
+import {authRoute} from './routes/auth';
 
 
 (function () {
@@ -71,6 +72,7 @@ import { auditoriesUpdate } from './jobs/auditories';
   initDB().then().catch();
 
   app.register(scheduleRoute, { prefix: '/api' })
+  app.register(authRoute, { prefix: '/api' })
   schedulingParserJob().then().catch()
 
 

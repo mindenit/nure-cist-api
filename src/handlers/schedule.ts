@@ -18,6 +18,7 @@ import { IScheduleQueries } from '../interfaces/schedule';
 import { Group } from '../db/models/Group';
 import { Teacher } from '../db/models/Teacher';
 import { Auditory } from '../db/models/Auditory';
+import {Change} from '../db/models/Change';
 
 export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyReply) => {
     try {
@@ -37,10 +38,10 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
                 lastRequest: new Date().toDateString(),
             })
 
-            const schedule = await getScheduleByType({ id, start_time, end_time, type, attr: ['createdAt'] });
+            const schedule = await getScheduleByType({ id, start_time, end_time, type, attr: ['createdAt'], isDeleted: false, });
             if (schedule.length !== 0) {
                 res.code(200);
-                return res.send(JSON.stringify(schedule, null, 2));
+                return res.send(JSON.stringify({ schedule }, null, 2));
             }
         }
 
@@ -56,11 +57,11 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
                 lastRequest: new Date().toDateString(),
             })
 
-            const schedule = await getScheduleByType({ id, start_time, end_time, type });
+            const schedule = await getScheduleByType({ id, start_time, end_time, type, isDeleted: false });
 
             if (schedule.length !== 0) {
                 res.code(200);
-                return res.send(JSON.stringify(schedule, null, 2));
+                return res.send(JSON.stringify({ schedule }, null, 2));
             }
         }
 
@@ -76,26 +77,26 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
                 lastRequest: new Date().toDateString(),
             })
 
-            const schedule = await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type });
+            const schedule = await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type, isDeleted: false });
 
             if (schedule.length !== 0) {
                 res.code(200);
-                return res.send(JSON.stringify(schedule, null, 2));
+                return res.send(JSON.stringify({ schedule }, null, 2));
             }
 
             const eventsFromCist = await getEventsByIdFromCist(id, typeId);
 
             await parseCistEvents({ eventsFromCist, type, id })
             res.code(200);
-            return res.send(JSON.stringify(await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type }), null, 2))
+            return res.send(JSON.stringify({ schedule: await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type, isDeleted: false }) }, null, 2))
         }
 
         const eventsFromCist = await getEventsByIdFromCist(id, typeId);
 
         await parseCistEvents({ eventsFromCist, type, id })
         res.code(200);
-        const response = await getScheduleByType({ id, start_time, end_time, type })
-        return res.send(JSON.stringify(response, null, 2))
+        const response = await getScheduleByType({ id, start_time, end_time, type, isDeleted: false })
+        return res.send(JSON.stringify({ schedule: response }, null, 2))
 
     }
     catch (e) {
@@ -151,3 +152,23 @@ export const getAuditories = async (_req: FastifyRequest, res: FastifyReply) => 
         return res.internalServerError('Internal server error');
     }
 }
+
+export const getChanges = async (_req: FastifyRequest, res: FastifyReply) => {
+    try {
+        const { groupId } = <{groupId?: number}>_req.query
+
+        const changes = await Change.findAll({
+            where: {
+                ...(groupId ? { groupId } : null)
+            }
+        })
+
+        return res.code(200).send(JSON.stringify(changes, null, 2));
+    }
+    catch (e) {
+        console.log('[getAllChanges]', e)
+        return res.internalServerError('Internal server error');
+    }
+}
+
+

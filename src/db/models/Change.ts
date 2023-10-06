@@ -1,12 +1,10 @@
 // Core
-import {Model, Table, Column, DataType, BelongsTo, ForeignKey, BelongsToMany, DefaultScope} from 'sequelize-typescript'
+import {Model, Table, Column, DataType, BelongsTo, ForeignKey, DefaultScope } from 'sequelize-typescript'
 
 // Models
-import { Group } from './Group';
-import { Teacher } from './Teacher';
 import { Subject } from './Subject';
-import { GroupEvent } from './GroupEvent';
-import { TeacherEvent } from './TeacherEvent';
+import {Group} from './Group';
+
 
 export enum LessonType {
     Pz = 'Пз',
@@ -19,14 +17,14 @@ export enum LessonType {
 }
 @DefaultScope(() => ({
     attributes: {
-        exclude: ['subjectId', 'createdAt']
+        exclude: ['subjectId']
     }
 }))
 @Table({
     timestamps: true,
     deletedAt: true,
 })
-export class Event extends Model {
+export class Change extends Model {
     @Column({ type: DataType.BIGINT, primaryKey: true, autoIncrement: true })
     id: number;
 
@@ -45,22 +43,18 @@ export class Event extends Model {
     @Column({ type: DataType.ENUM(...Object.values(LessonType)), })
     type: LessonType;
 
-    @Column({ type: DataType.BOOLEAN, defaultValue: false })
-    isDeleted: boolean;
+    @Column({ type: DataType.STRING, defaultValue: false })
+    typeChange: 'OLD' | 'NEW';
 
     @ForeignKey(() => Subject)
     subjectId: number;
 
-    @BelongsToMany(() => Group, {
-        through: { model: () => GroupEvent }
-    })
-    groups: Group[];
-
-    @BelongsToMany(() => Teacher, {
-        through: { model: () => TeacherEvent }
-    })
-    teachers: Teacher[];
+    @ForeignKey(() => Group)
+    groupId: number
 
     @BelongsTo(() => Subject)
     subject: Subject;
+
+    @BelongsTo(() => Group)
+    group: Group
 }
