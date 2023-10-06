@@ -66,6 +66,9 @@ export const getScheduleByType = async ({id, start_time, end_time, type, isDelet
                 isDeleted,
                 ...(type === 'auditory' ? { auditory: id  } : null),
             },
+            attributes: {
+              exclude: ['isDeleted']
+            },
             include: [
                 {
                     model: Group,
@@ -108,6 +111,8 @@ export const getEventsByIdFromCist = async (id: number, typeId: number): Promise
     let schedule;
     try {
         const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const septemberFirstCurrentYear = new Date(currentYear, 8, 1); // 8 представляет сентябрь (январь - 0, февраль - 1, и так далее)
 
         const currentDayOfWeek = currentDate.getDay();
         const daysUntilMonday = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
@@ -116,13 +121,10 @@ export const getEventsByIdFromCist = async (id: number, typeId: number): Promise
         startOfWeek.setDate(currentDate.getDate() - daysUntilMonday);
         startOfWeek.setHours(0, 0, 0, 0);
 
-        const nextYear = currentDate.getFullYear() + 1;
-        const septemberFirstNextYear = new Date(nextYear, 8, 1);
-
         const startOfWeekUnix = Math.floor(startOfWeek.getTime() / 1000);
-        const septemberFirstNextYearUnix = Math.floor(septemberFirstNextYear.getTime() / 1000);
+        const septemberFirstCurrentYearUnix = Math.floor(septemberFirstCurrentYear.getTime() / 1000);
 
-        schedule = await fetch(`${env.API_URL}/P_API_EVEN_JSON?timetable_id=${id}&time_from=${startOfWeekUnix}&time_to=${septemberFirstNextYearUnix}&type_id=${typeId}&idClient=${env.API_KEY}`, {
+        schedule = await fetch(`${env.API_URL}/P_API_EVEN_JSON?timetable_id=${id}&time_from=${startOfWeekUnix}&time_to=${septemberFirstCurrentYearUnix}&type_id=${typeId}&idClient=${env.API_KEY}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -339,7 +341,6 @@ export const findDifference = (arr1: object[], arr2: object[]): object => {
     }
     for (const obj1 of arr1) {
         for (const obj2 of arr2) {
-            // console.log(obj2['type'] === 'Зал' ? obj2 : '')
             if (obj1['start_time'] === obj2['start_time'] && obj1['end_time'] === obj2['end_time']) {
                 if (obj1['groups'][0]['name'] !== obj2['groups'][0]['name'] || obj1['subject']['brief'] !== obj2['subject']['brief']) {
                     difference['newLessons'].push(obj2)
@@ -355,6 +356,5 @@ export const findDifference = (arr1: object[], arr2: object[]): object => {
         }
     }
 
-    console.log(difference)
     return difference
 }

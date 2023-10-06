@@ -41,7 +41,7 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
             const schedule = await getScheduleByType({ id, start_time, end_time, type, attr: ['createdAt'], isDeleted: false, });
             if (schedule.length !== 0) {
                 res.code(200);
-                return res.send(JSON.stringify({ schedule }, null, 2));
+                return res.send(JSON.stringify(schedule, null, 2));
             }
         }
 
@@ -61,7 +61,7 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
 
             if (schedule.length !== 0) {
                 res.code(200);
-                return res.send(JSON.stringify({ schedule }, null, 2));
+                return res.send(JSON.stringify(schedule, null, 2));
             }
         }
 
@@ -81,14 +81,14 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
 
             if (schedule.length !== 0) {
                 res.code(200);
-                return res.send(JSON.stringify({ schedule }, null, 2));
+                return res.send(JSON.stringify(schedule , null, 2));
             }
 
             const eventsFromCist = await getEventsByIdFromCist(id, typeId);
 
             await parseCistEvents({ eventsFromCist, type, id })
             res.code(200);
-            return res.send(JSON.stringify({ schedule: await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type, isDeleted: false }) }, null, 2))
+            return res.send(JSON.stringify(await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type, isDeleted: false }), null, 2))
         }
 
         const eventsFromCist = await getEventsByIdFromCist(id, typeId);
@@ -96,7 +96,7 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
         await parseCistEvents({ eventsFromCist, type, id })
         res.code(200);
         const response = await getScheduleByType({ id, start_time, end_time, type, isDeleted: false })
-        return res.send(JSON.stringify({ schedule: response }, null, 2))
+        return res.send(JSON.stringify(response, null, 2))
 
     }
     catch (e) {
