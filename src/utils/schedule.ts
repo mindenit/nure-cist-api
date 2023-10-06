@@ -123,7 +123,7 @@ export const getEventsByIdFromCist = async (id: number, typeId: number): Promise
 
         const startOfWeekUnix = Math.floor(startOfWeek.getTime() / 1000);
         const septemberFirstCurrentYearUnix = Math.floor(septemberFirstCurrentYear.getTime() / 1000);
-
+        console.log(`${env.API_URL}/P_API_EVEN_JSON?timetable_id=${id}&time_from=${startOfWeekUnix}&time_to=${septemberFirstCurrentYearUnix}&type_id=${typeId}&idClient=${env.API_KEY}`)
         schedule = await fetch(`${env.API_URL}/P_API_EVEN_JSON?timetable_id=${id}&time_from=${startOfWeekUnix}&time_to=${septemberFirstCurrentYearUnix}&type_id=${typeId}&idClient=${env.API_KEY}`, {
             method: 'GET',
             headers: {

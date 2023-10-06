@@ -101,7 +101,7 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
     }
     catch (e) {
         console.log('[getScheduleByGroupName]', e)
-        return res.internalServerError('Internal server error');
+        return res.send(JSON.stringify({}, null, 2));
     }
 }
 
