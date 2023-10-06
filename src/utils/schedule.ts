@@ -111,20 +111,15 @@ export const getEventsByIdFromCist = async (id: number, typeId: number): Promise
     let schedule;
     try {
         const currentDate = new Date();
-        const currentYear = currentDate.getFullYear();
-        const septemberFirstCurrentYear = new Date(currentYear, 8, 1); // 8 представляет сентябрь (январь - 0, февраль - 1, и так далее)
 
-        const currentDayOfWeek = currentDate.getDay();
-        const daysUntilMonday = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
+        const nextYear = currentDate.getFullYear() + 1;
+        const septemberFirstNextYear = new Date(nextYear, 8, 1);
 
-        const startOfWeek = new Date(currentDate);
-        startOfWeek.setDate(currentDate.getDate() - daysUntilMonday);
-        startOfWeek.setHours(0, 0, 0, 0);
+        const septemberFirstCurrentYearUnix = Math.floor(new Date(currentDate.getFullYear(), 8, 1).getTime() / 1000);
 
-        const startOfWeekUnix = Math.floor(startOfWeek.getTime() / 1000);
-        const septemberFirstCurrentYearUnix = Math.floor(septemberFirstCurrentYear.getTime() / 1000);
-        console.log(`${env.API_URL}/P_API_EVEN_JSON?timetable_id=${id}&time_from=${startOfWeekUnix}&time_to=${septemberFirstCurrentYearUnix}&type_id=${typeId}&idClient=${env.API_KEY}`)
-        schedule = await fetch(`${env.API_URL}/P_API_EVEN_JSON?timetable_id=${id}&time_from=${startOfWeekUnix}&time_to=${septemberFirstCurrentYearUnix}&type_id=${typeId}&idClient=${env.API_KEY}`, {
+        const septemberFirstNextYearUnix = Math.floor(septemberFirstNextYear.getTime() / 1000);
+
+        schedule = await fetch(`${env.API_URL}/P_API_EVEN_JSON?timetable_id=${id}&time_from=${septemberFirstCurrentYearUnix}&time_to=${septemberFirstNextYearUnix}&type_id=${typeId}&idClient=${env.API_KEY}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
