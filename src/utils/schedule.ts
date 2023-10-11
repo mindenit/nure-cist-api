@@ -175,6 +175,17 @@ export const getLessonType = (id: number): LessonType => {
     }
 }
 
+const checkTeacherorCreate = async (teacherId: number) => {
+    const teacher = await Teacher.findByPk(teacherId)
+    if (!teacher) {
+        await Teacher.create({
+            id: teacherId,
+            full_name: '',
+            short_name: ''
+        })
+    }
+}
+
 export interface IParserCistEventsPayload {
     type: string;
     eventsFromCist: IDecodedSchedule
@@ -184,6 +195,7 @@ export interface IParserCistEventsPayload {
 const handleCisEventsByGroup = async (teachers: number[], groupId: number, eventId: number) => {
     try {
         for (const teacher of teachers) {
+            checkTeacherorCreate(teacher)
             await TeacherEvent.create({
                 eventId: eventId,
                 teacherId: teacher
@@ -208,6 +220,8 @@ const handleCistEventByTeacher = async (groups: number[], teacherId: number, eve
                 groupId: group,
             })
         }
+
+        checkTeacherorCreate(teacherId)
 
         await TeacherEvent.create({
             eventId: eventId,

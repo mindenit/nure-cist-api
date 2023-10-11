@@ -2,20 +2,16 @@
 import helmet from '@fastify/helmet';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
-import fastifyCron from 'fastify-cron';
 
 // Tools
 import { createApp } from './app';
 import { env, config } from './config';
 import initDB from './db';
 import { scheduleRoute } from './routes/schedule';
+import { authRoute } from './routes/auth';
 
 // Jobs
 import { schedulingParserJob } from './jobs/scheduling';
-import { groupsUpdate } from './jobs/groups';
-import { teachersUpdate } from './jobs/teachers';
-import { auditoriesUpdate } from './jobs/auditories';
-import {authRoute} from './routes/auth';
 
 
 (function () {
@@ -45,25 +41,6 @@ import {authRoute} from './routes/auth';
     }
   })
 
-  app.register(fastifyCron, {
-    jobs: [{
-      cronTime: '0 6 * * *',
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      onTick: async () => await groupsUpdate()
-    },
-      {
-        cronTime: '15 6 * * *',
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onTick: async () => await teachersUpdate()
-      },
-      {
-        cronTime: '30 6 * * *',
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onTick: async () => await auditoriesUpdate()
-      }
-      ]
-  })
-
   app.get('/spec', async (_req, _res) => {
     return app.swagger();
   });
@@ -82,7 +59,6 @@ import {authRoute} from './routes/auth';
         host: env.HOST ?? 'localhost'
       },
       (err, _address) => {
-        app.cron.startAllJobs();
         if (err) {
           app.log.error(err);
           process.exit(1);
