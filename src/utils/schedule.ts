@@ -195,7 +195,7 @@ export interface IParserCistEventsPayload {
 const handleCisEventsByGroup = async (teachers: number[], groupId: number, eventId: number) => {
     try {
         for (const teacher of teachers) {
-            checkTeacherorCreate(teacher)
+            await checkTeacherorCreate(teacher)
             await TeacherEvent.create({
                 eventId: eventId,
                 teacherId: teacher
@@ -221,7 +221,7 @@ const handleCistEventByTeacher = async (groups: number[], teacherId: number, eve
             })
         }
 
-        checkTeacherorCreate(teacherId)
+        await checkTeacherorCreate(teacherId)
 
         await TeacherEvent.create({
             eventId: eventId,
