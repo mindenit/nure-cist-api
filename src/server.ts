@@ -14,7 +14,7 @@ import { authRoute } from './routes/auth';
 import { schedulingParserJob } from './jobs/scheduling';
 
 
-(function () {
+(async function async() {
   const app = createApp({
     logger: config[env.NODE_ENV].logger,
   });
@@ -46,11 +46,11 @@ import { schedulingParserJob } from './jobs/scheduling';
   });
 
 
-  initDB().then().catch();
+  await initDB()
 
-  app.register(scheduleRoute, { prefix: '/api' })
-  app.register(authRoute, { prefix: '/api' })
-  schedulingParserJob().then().catch()
+  app.register(scheduleRoute, {prefix: '/api'})
+  app.register(authRoute, {prefix: '/api'})
+  await schedulingParserJob()
 
 
   app.listen(
