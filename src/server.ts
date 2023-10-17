@@ -13,6 +13,9 @@ import { authRoute } from './routes/auth';
 // Jobs
 import { schedulingParserJob } from './jobs/scheduling';
 
+initDB().then().catch();
+schedulingParserJob().then().catch();
+
 
 (async function async() {
   const app = createApp({
@@ -45,13 +48,8 @@ import { schedulingParserJob } from './jobs/scheduling';
     return app.swagger();
   });
 
-
-  await initDB()
-
   app.register(scheduleRoute, {prefix: '/api'})
   app.register(authRoute, {prefix: '/api'})
-  await schedulingParserJob()
-
 
   app.listen(
       {
