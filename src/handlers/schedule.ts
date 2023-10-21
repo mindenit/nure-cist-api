@@ -3,6 +3,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 
 // Tools
 import {
+    checkTimeDifference,
     getAuditoryById,
     getEventsByIdFromCist,
     getGroupById,
@@ -19,6 +20,7 @@ import { Group } from '../db/models/Group';
 import { Teacher } from '../db/models/Teacher';
 import { Auditory } from '../db/models/Auditory';
 import {Change} from '../db/models/Change';
+import { Event } from '../db/models/Event'
 
 export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyReply) => {
     try {
@@ -27,6 +29,7 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
         const typeId = type === 'group' ? 1 : type === 'teacher' ? 2 : 3;
 
         if (typeId === 1) {
+
             const findingGroup = await getGroupById(id);
 
             if (!findingGroup) {
@@ -37,9 +40,20 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
                 isActive: true,
                 lastRequest: new Date().toDateString(),
             })
-
-            const schedule = await getScheduleByType({ id, start_time, end_time, type, attr: ['createdAt'], isDeleted: false, });
+            const schedule = await getScheduleByType({ id, start_time, end_time, type, attr: ['createdAt'], isDeleted: false });
             if (schedule.length !== 0) {
+                if (await checkTimeDifference(schedule[0])) {
+                    schedule.map(async (el) => await Event.destroy({
+                        where: {
+                            id: el.id
+                        }
+                    }))
+                    const eventsFromCist = await getEventsByIdFromCist(id, typeId);
+
+                    await parseCistEvents({ eventsFromCist, type, id })
+                    res.code(200);
+                    return res.send(JSON.stringify(await getScheduleByType({ id, start_time, end_time, type, isDeleted: false }), null, 2))
+                }
                 res.code(200);
                 return res.send(JSON.stringify(schedule, null, 2));
             }
@@ -57,9 +71,20 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
                 lastRequest: new Date().toDateString(),
             })
 
-            const schedule = await getScheduleByType({ id, start_time, end_time, type, isDeleted: false });
-
+            const schedule = await getScheduleByType({ id, start_time, end_time, type, attr: ['createdAt'], isDeleted: false });
             if (schedule.length !== 0) {
+                if (await checkTimeDifference(schedule[0])) {
+                    schedule.map(async (el) => await Event.destroy({
+                        where: {
+                            id: el.id
+                        }
+                    }))
+                    const eventsFromCist = await getEventsByIdFromCist(id, typeId);
+
+                    await parseCistEvents({ eventsFromCist, type, id })
+                    res.code(200);
+                    return res.send(JSON.stringify(await getScheduleByType({ id, start_time, end_time, type, isDeleted: false }), null, 2))
+                }
                 res.code(200);
                 return res.send(JSON.stringify(schedule, null, 2));
             }
@@ -77,18 +102,23 @@ export const getScheduleByTypeAndid = async (_req: FastifyRequest, res: FastifyR
                 lastRequest: new Date().toDateString(),
             })
 
-            const schedule = await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type, isDeleted: false });
-
+            const schedule = await getScheduleByType({ id, start_time, end_time, type, attr: ['createdAt'], isDeleted: false });
             if (schedule.length !== 0) {
+                if (await checkTimeDifference(schedule[0])) {
+                    schedule.map(async (el) => await Event.destroy({
+                        where: {
+                            id: el.id
+                        }
+                    }))
+                    const eventsFromCist = await getEventsByIdFromCist(id, typeId);
+
+                    await parseCistEvents({ eventsFromCist, type, id })
+                    res.code(200);
+                    return res.send(JSON.stringify(await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type, isDeleted: false }), null, 2))
+                }
                 res.code(200);
-                return res.send(JSON.stringify(schedule , null, 2));
+                return res.send(JSON.stringify(schedule, null, 2));
             }
-
-            const eventsFromCist = await getEventsByIdFromCist(id, typeId);
-
-            await parseCistEvents({ eventsFromCist, type, id })
-            res.code(200);
-            return res.send(JSON.stringify(await getScheduleByType({ id: findingAuditory.name, start_time, end_time, type, isDeleted: false }), null, 2))
         }
 
         const eventsFromCist = await getEventsByIdFromCist(id, typeId);

@@ -378,3 +378,11 @@ export const findDifference = (arr1: object[], arr2: object[]): object => {
 
     return difference
 }
+
+
+export const checkTimeDifference = async (event: Event) => {
+    const currentTime = new Date();
+    const timeDifferenceInMilliseconds = currentTime.getTime() - event.updatedAt.getTime();
+    const threeHoursInMilliseconds = 3 * 60 * 60 * 1000;
+    return timeDifferenceInMilliseconds > threeHoursInMilliseconds;
+}

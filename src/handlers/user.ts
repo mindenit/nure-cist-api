@@ -45,6 +45,9 @@ export const getUserGroups = async (_req: FastifyRequest, res: FastifyReply) => 
             include: {
                 model: Group,
                 include: [],
+                attributes: {
+                    exclude: ['isActive', 'lastRequest']
+                },
                 through: { attributes: [] }
             }
         })
@@ -52,7 +55,7 @@ export const getUserGroups = async (_req: FastifyRequest, res: FastifyReply) => 
         console.log(userGroups)
 
         res.code(200)
-        return res.send(JSON.stringify(userGroups, null, 2))
+        return res.send(JSON.stringify({ groups:  userGroups.groups }, null, 2))
     } catch (e) {
         console.log('[getUserGroups]', e)
         return res.internalServerError('Internal server error');
