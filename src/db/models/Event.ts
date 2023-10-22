@@ -45,8 +45,8 @@ export class Event extends Model {
     @Column({ type: DataType.ENUM(...Object.values(LessonType)), })
     type: LessonType;
 
-    @Column({ type: DataType.BOOLEAN, defaultValue: false })
-    isDeleted: boolean;
+    // @Column({ type: DataType.BOOLEAN, defaultValue: false })
+    // isDeleted: boolean;
 
     @ForeignKey(() => Subject)
     subjectId: number;

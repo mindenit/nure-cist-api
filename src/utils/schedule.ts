@@ -49,7 +49,7 @@ interface IScheduleTypePayload {
     type: string;
     start_time: number;
     end_time: number;
-    isDeleted: boolean;
+    isDeleted?: boolean;
     attr?: string[]
 }
 
@@ -63,7 +63,6 @@ export const getScheduleByType = async ({id, start_time, end_time, type, isDelet
                 end_time: {
                     [Op.lte]: end_time
                 },
-                isDeleted,
                 ...(type === 'auditory' ? { auditory: id  } : null),
             },
             attributes: {
