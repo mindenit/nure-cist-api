@@ -185,6 +185,8 @@ const checkTeacherorCreate = async (teacherId: number) => {
     }
 }
 
+// const checkTeacherorCreate = async
+
 export interface IParserCistEventsPayload {
     type: string;
     eventsFromCist: IDecodedSchedule
